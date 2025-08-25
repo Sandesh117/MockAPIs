@@ -17,7 +17,6 @@ func RegisterRoutes() *mux.Router {
 		w.Write([]byte(`{"status":"ok"}`))
 	}).Methods(http.MethodGet)
 
-	// Sila transact endpoint
 	r.HandleFunc("/sila_transact", services.HandleSilaTransact).Methods(http.MethodPost)
 
 	return r
