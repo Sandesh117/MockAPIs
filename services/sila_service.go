@@ -7,6 +7,7 @@ import (
 	"math/rand"
 	"net/http"
 	"os"
+	"strconv"
 	"time"
 
 	"github.com/MockApis/models"
@@ -49,6 +50,54 @@ func HandleSilaTransact(w http.ResponseWriter, r *http.Request) {
 	}
 
 	go triggerWebhook(webhookURL, transactionID, req.Amount)
+}
+func HandleNCHLTransact(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodPost {
+		http.Error(w, "method not allowed", http.StatusMethodNotAllowed)
+		return
+	}
+
+	var req models.SilaTransactRequest
+	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+		http.Error(w, "invalid request payload", http.StatusBadRequest)
+		return
+	}
+
+	// Generate random batchId and IDs
+	randomBatchNum := rand.Intn(900000) + 100000 // 6 digits
+	batchID := "KHA-" + strconv.Itoa(randomBatchNum)
+	cipsBatchID := rand.Intn(1000) + 1
+	txnID := rand.Intn(1000) + 1
+	instructionID := batchID + "-" + strconv.Itoa(rand.Intn(100)+1)
+
+	// Construct response
+	resp := map[string]interface{}{
+		"cipsBatchResponse": map[string]interface{}{
+			"responseCode":    "000",
+			"responseMessage": "SUCCESS",
+			"batchId":         batchID,
+			"debitStatus":     "000",
+			"id":              cipsBatchID,
+		},
+		"cipsTxnResponseList": []map[string]interface{}{
+			{
+				"responseCode":    "000",
+				"responseMessage": "SUCCESS",
+				"id":              txnID,
+				"instructionId":   instructionID,
+				"creditStatus":    "000",
+			},
+		},
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(resp)
+
+	// Optional: trigger webhook
+	webhookURL := os.Getenv("WEBHOOK_URL")
+	if webhookURL != "" {
+		go triggerWebhook(webhookURL, instructionID, req.Amount)
+	}
 }
 
 func triggerWebhook(webhookURL, transactionID string, amount string) {
