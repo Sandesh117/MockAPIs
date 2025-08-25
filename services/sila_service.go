@@ -51,11 +51,11 @@ func HandleSilaTransact(w http.ResponseWriter, r *http.Request) {
 	go triggerWebhook(webhookURL, transactionID, req.Amount)
 }
 
-func triggerWebhook(webhookURL, transactionID string, amount int64) {
+func triggerWebhook(webhookURL, transactionID string, amount string) {
 	time.Sleep(15 * time.Second) // delay ~1 min
 
 	event := models.WebhookEvent{
-		EventTime: time.Now().Unix(),
+		EventTime: time.Now().Format(time.RFC3339),
 		EventType: "transaction",
 		EventUUID: uuid.New().String(),
 	}
