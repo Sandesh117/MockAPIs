@@ -2,31 +2,14 @@ package models
 
 // SilaTransactRequest represents the incoming transact request payload
 type SilaTransactRequest struct {
-	// Header struct {
-	// 	Created    int64  `json:"created"`
-	// 	AppHandle  string `json:"app_handle"`
-	// 	UserHandle string `json:"user_handle"`
-	// 	Version    string `json:"version,omitempty"`
-	// 	Reference  string `json:"reference,omitempty"`
-	// } `json:"header"`
-	Amount                      int64  `json:"amount"`
-	SourceID                    string `json:"source_id"`
-	DestinationID               string `json:"destination_id"`
-	// Route                       string `json:"route"`
-	// RouteSelectionBehavior      string `json:"route_selection_behavior,omitempty"`
-	// Description                 string `json:"description,omitempty"`
-	// TransactionIdempotencyID    string `json:"transaction_idempotency_id,omitempty"`
-	// TransactionIdempotencyIdent string `json:"transaction_idempotency_identifier,omitempty"`
-	// CustomerReference           string `json:"customer_reference,omitempty"`
-	// AchAttributes               *struct {
-	// 	AchDescriptor string `json:"ach_descriptor,omitempty"`
-	// 	SecCode       string `json:"sec_code,omitempty"`
-	// } `json:"ach_attributes,omitempty"`
+	Amount        int64  `json:"amount"`
+	SourceID      string `json:"source_id"`
+	DestinationID string `json:"destination_id"`
 }
 
 // SilaTransactResponse represents the response after transact
 type SilaTransactResponse struct {
-	Reference       string `json:"reference"`
+	// Reference       string `json:"reference"`
 	SilaReferenceID string `json:"sila_reference_id"`
 	Message         string `json:"message"`
 	Success         bool   `json:"success"`

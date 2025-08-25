@@ -20,8 +20,5 @@ func RegisterRoutes() *mux.Router {
 	// Sila transact endpoint
 	r.HandleFunc("/sila_transact", services.HandleSilaTransact).Methods(http.MethodPost)
 
-	// Webhook receiver endpoint
-	r.HandleFunc("/webhook_event_receiver", services.HandleWebhookReceiver).Methods(http.MethodPost)
-
 	return r
 }

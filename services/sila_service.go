@@ -6,6 +6,7 @@ import (
 	"log"
 	"math/rand"
 	"net/http"
+	"os"
 	"time"
 
 	"github.com/MockApis/models"
@@ -13,7 +14,6 @@ import (
 	"github.com/google/uuid"
 )
 
-// HandleSilaTransact handles POST /sila_transact
 func HandleSilaTransact(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodPost {
 		http.Error(w, "method not allowed", http.StatusMethodNotAllowed)
@@ -23,12 +23,12 @@ func HandleSilaTransact(w http.ResponseWriter, r *http.Request) {
 	var req models.SilaTransactRequest
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
 		http.Error(w, "invalid request payload", http.StatusBadRequest)
+		log.Println("Decode error:", err)
 		return
 	}
 
 	transactionID := uuid.New().String()
 	response := models.SilaTransactResponse{
-		// Reference:       req.Header.Reference,
 		SilaReferenceID: uuid.New().String(),
 		Message:         "Transaction submitted to the processing queue.",
 		Success:         true,
@@ -36,30 +36,24 @@ func HandleSilaTransact(w http.ResponseWriter, r *http.Request) {
 		ResponseTimeMS:  "171",
 		TransactionID:   transactionID,
 		Itinerary:       "STANDARD_ACH",
-		// Description:     req.Description,
 	}
 
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(response)
 
-	// Fire webhook asynchronously
-	go triggerWebhook(transactionID, req.Amount)
-}
-
-// HandleWebhookReceiver handles POST /webhook_event_receiver
-func HandleWebhookReceiver(w http.ResponseWriter, r *http.Request) {
-	if r.Method != http.MethodPost {
-		http.Error(w, "method not allowed", http.StatusMethodNotAllowed)
+	// Launch webhook asynchronously
+	webhookURL := os.Getenv("WEBHOOK_URL")
+	if webhookURL == "" {
+		log.Println("WEBHOOK_URL not set, skipping webhook")
 		return
 	}
 
-	log.Println("Webhook event received")
-	w.WriteHeader(http.StatusOK)
+	go triggerWebhook(webhookURL, transactionID, req.Amount)
 }
 
-// triggerWebhook simulates webhook callback after ~1 minute
-func triggerWebhook(transactionID string, amount int64) {
-	time.Sleep(10 * time.Second) // delay
+// triggerWebhook sends a webhook event to the configured URL
+func triggerWebhook(webhookURL, transactionID string, amount int64) {
+	time.Sleep(60 * time.Second) // delay ~1 min
 
 	event := models.WebhookEvent{
 		EventTime: time.Now().Unix(),
@@ -70,7 +64,6 @@ func triggerWebhook(transactionID string, amount int64) {
 	event.EventDetail.TransactionType = "transfer"
 	event.EventDetail.SilaAmount = amount
 
-	// Random outcome (success, failed, etc.)
 	outcomes := []string{"success", "failed", "review", "refunded", "refund_failed"}
 	event.EventDetail.Outcome = outcomes[rand.Intn(len(outcomes))]
 
@@ -79,12 +72,11 @@ func triggerWebhook(transactionID string, amount int64) {
 
 	body, _ := json.Marshal(event)
 
-	resp, err := http.Post("http://localhost:5000/webhook_event_receiver",
-		"application/json", bytes.NewBuffer(body))
+	resp, err := http.Post(webhookURL, "application/json", bytes.NewBuffer(body))
 	if err != nil {
-		log.Printf("Error sending webhook: %v", err)
+		log.Printf("Error sending webhook to %s: %v", webhookURL, err)
 		return
 	}
 	defer resp.Body.Close()
-	log.Println("Webhook event sent with status:", resp.Status)
+	log.Printf("Webhook event sent to %s with status: %s", webhookURL, resp.Status)
 }
