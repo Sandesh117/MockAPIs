@@ -1,22 +1,17 @@
 package main
 
 import (
-	"fmt"
 	"log"
 	"net/http"
 
-	"github.com/MockApis/services"
+	"github.com/MockApis/routes"
 )
 
 func main() {
-	http.HandleFunc("/sila_transact", services.HandleSilaTransact)
-	http.HandleFunc("/webhook_event_receiver", func(w http.ResponseWriter, r *http.Request) {
-		fmt.Println("Webhook received")
-		w.WriteHeader(http.StatusOK)
-	})
+	r := routes.RegisterRoutes()
 
-	log.Println("Mock Sila API running on :5000")
-	if err := http.ListenAndServe(":5000", nil); err != nil {
+	log.Println("🚀 Mock Sila API running on :5000")
+	if err := http.ListenAndServe(":5000", r); err != nil {
 		log.Fatal(err)
 	}
 }

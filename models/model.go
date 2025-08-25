@@ -2,26 +2,26 @@ package models
 
 // SilaTransactRequest represents the incoming transact request payload
 type SilaTransactRequest struct {
-	Header struct {
-		Created    int64  `json:"created"`
-		AppHandle  string `json:"app_handle"`
-		UserHandle string `json:"user_handle"`
-		Version    string `json:"version,omitempty"`
-		Reference  string `json:"reference,omitempty"`
-	} `json:"header"`
+	// Header struct {
+	// 	Created    int64  `json:"created"`
+	// 	AppHandle  string `json:"app_handle"`
+	// 	UserHandle string `json:"user_handle"`
+	// 	Version    string `json:"version,omitempty"`
+	// 	Reference  string `json:"reference,omitempty"`
+	// } `json:"header"`
 	Amount                      int64  `json:"amount"`
 	SourceID                    string `json:"source_id"`
 	DestinationID               string `json:"destination_id"`
-	Route                       string `json:"route"`
-	RouteSelectionBehavior      string `json:"route_selection_behavior,omitempty"`
-	Description                 string `json:"description,omitempty"`
-	TransactionIdempotencyID    string `json:"transaction_idempotency_id,omitempty"`
-	TransactionIdempotencyIdent string `json:"transaction_idempotency_identifier,omitempty"`
-	CustomerReference           string `json:"customer_reference,omitempty"`
-	AchAttributes               *struct {
-		AchDescriptor string `json:"ach_descriptor,omitempty"`
-		SecCode       string `json:"sec_code,omitempty"`
-	} `json:"ach_attributes,omitempty"`
+	// Route                       string `json:"route"`
+	// RouteSelectionBehavior      string `json:"route_selection_behavior,omitempty"`
+	// Description                 string `json:"description,omitempty"`
+	// TransactionIdempotencyID    string `json:"transaction_idempotency_id,omitempty"`
+	// TransactionIdempotencyIdent string `json:"transaction_idempotency_identifier,omitempty"`
+	// CustomerReference           string `json:"customer_reference,omitempty"`
+	// AchAttributes               *struct {
+	// 	AchDescriptor string `json:"ach_descriptor,omitempty"`
+	// 	SecCode       string `json:"sec_code,omitempty"`
+	// } `json:"ach_attributes,omitempty"`
 }
 
 // SilaTransactResponse represents the response after transact
@@ -50,10 +50,10 @@ type WebhookEvent struct {
 		Entity          string `json:"entity"`
 		ProcessingType  string `json:"processing_type"`
 		ProviderStatus  string `json:"provider_status"`
-		ReturnCode      string `json:"return_code"`
-		ReturnDesc      string `json:"return_description"`
-		OldGraph        string `json:"old_graph"`
-		OldRoute        string `json:"old_route"`
-		NewRoute        string `json:"new_route"`
+		// ReturnCode      string `json:"return_code"`
+		// ReturnDesc      string `json:"return_description"`
+		// OldGraph        string `json:"old_graph"`
+		// OldRoute        string `json:"old_route"`
+		// NewRoute        string `json:"new_route"`
 	} `json:"event_details"`
 }
